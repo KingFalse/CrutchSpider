@@ -1,10 +1,15 @@
 package com.cnwy.views.start;
 
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyPressEvent;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
@@ -38,6 +43,17 @@ public class StartView extends VerticalLayout {
         start.setSuffixComponent(new Span(":)"));
         start.setWidth("60%");
         start.setAutofocus(true);
+        start.addKeyPressListener(Key.ENTER, keyPressEvent -> {
+            if (!start.getValue().startsWith("http")){
+                Notification notification = new Notification("似乎输入的不是正确的链接...",5000, Notification.Position.TOP_END);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notification.open();
+                start.focus();
+                return;
+            }
+            System.err.println("xxxx"+start.getValue());
+        });
+
         add(start);
 
         setSizeFull();
