@@ -3,6 +3,7 @@ package com.cnwy.views.start;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyPressEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
@@ -49,6 +50,7 @@ public class StartView extends VerticalLayout {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                 notification.open();
                 start.focus();
+                UI.getCurrent().getPage().executeJs("alert(111);");
                 return;
             }
             System.err.println("xxxx"+start.getValue());
