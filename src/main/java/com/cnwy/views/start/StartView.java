@@ -38,7 +38,7 @@ public class StartView extends VerticalLayout {
 
 
         TextField start = new TextField();
-        start.setPlaceholder("请输入链接...");
+        start.setPlaceholder("请输入列表页面链接...");
         start.setClearButtonVisible(true);
         start.setPrefixComponent(VaadinIcon.THUMBS_UP_O.create());
         start.setSuffixComponent(new Span(":)"));
@@ -50,10 +50,9 @@ public class StartView extends VerticalLayout {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                 notification.open();
                 start.focus();
-                UI.getCurrent().getPage().executeJs("alert(111);");
-                return;
+            }else {
+                UI.getCurrent().getPage().executeJs("window.java.sayHelloTo('%s');".formatted(start.getValue()));
             }
-            System.err.println("xxxx"+start.getValue());
         });
 
         add(start);
