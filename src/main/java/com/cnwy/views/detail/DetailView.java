@@ -1,6 +1,9 @@
 package com.cnwy.views.detail;
 
+import com.cnwy.views.bind.BindField;
+import com.cnwy.views.bind.BindView;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -18,7 +21,9 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +33,7 @@ import java.util.regex.Pattern;
 public class DetailView extends VerticalLayout implements BeforeEnterObserver {
 
     public static final Map<String, String> cacheContext = new HashMap<>();
+    public static final Map<String, String> cacheXpath = new HashMap<>();
     String traceID;
     TextField start = new TextField();
     TextArea textArea = new TextArea();
@@ -69,14 +75,17 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
         layout.setDefaultVerticalComponentAlignment(Alignment.END);
         layout.setJustifyContentMode(JustifyContentMode.END);
 
+
+
         Button primaryButton = new Button("添加");
         layout.add(primaryButton);
         primaryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         primaryButton.addClickListener(event -> showBinding(start.getValue().strip()));
 
-        Button saveButton = new Button("提交");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layout.add(saveButton);
+        Button viewButton = new Button("查看");
+        layout.add(viewButton);
+        viewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        viewButton.addClickListener(event -> showBindResult());
         add(layout);
 
         textArea.setSizeFull();
@@ -88,6 +97,10 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(JustifyContentMode.START);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         getStyle().set("text-align", "center");
+    }
+
+    private void showBindResult() {
+        UI.getCurrent().navigate("bind/"+traceID);
     }
 
     @Override
@@ -112,8 +125,14 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
 
         dialog.setConfirmText("保存");
         dialog.addConfirmListener(event -> {
-            System.err.println("这个不错,我要保存");
+            if (!BindView.cacheContext.containsKey(traceID)) {
+                BindView.cacheContext.put(traceID, new ArrayList<>());
+            }
+            List<BindField> fields = BindView.cacheContext.get(traceID);
+            fields.add(new BindField(DetailView.cacheXpath.get(traceID), regex, select.getValue().strip()));
+            BindView.cacheContext.put(traceID, fields);
             Notification notification = Notification.show("已经保存绑定: " + regex, 3000, Notification.Position.TOP_CENTER);
+            System.err.println(traceID);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         });
         dialog.open();

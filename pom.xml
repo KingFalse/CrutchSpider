@@ -44,6 +44,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>de.f0rce</groupId>
+            <artifactId>ace</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.vaadin</groupId>
             <!-- Replace artifactId with vaadin-core to use only free components -->
             <artifactId>vaadin</artifactId>
