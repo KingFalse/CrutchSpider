@@ -127,7 +127,7 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("选择要绑定的属性");
         Select<String> select = new Select<>();
-        select.setItems("开始时间", "结束时间", "学历要求");
+        select.setItems("公司名称","专业要求","职位名称","城市","学历要求","英语等级要求","届别要求","招聘政策","招聘人数","招聘开始时间","招聘截止时间","招聘岗位描述","经验年限","福利代理");
         select.setPlaceholder("请选择");
         select.setWidthFull();
         dialog.add(select);
