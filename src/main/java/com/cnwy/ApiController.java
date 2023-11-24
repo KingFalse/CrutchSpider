@@ -1,15 +1,14 @@
 package com.cnwy;
 
+import com.alibaba.fastjson2.JSON;
 import com.cnwy.views.bind.BindField;
 import com.cnwy.views.bind.BindView;
 import com.cnwy.views.detail.DetailView;
 import com.cnwy.views.link.LinkView;
 import com.cnwy.views.link.SamplePerson;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.nimbusds.jose.util.JSONArrayUtils;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,11 @@ public class ApiController {
         DetailView.cacheContext.put(traceID, context);
         DetailView.cacheXpath.put(traceID, xPath);
         return "OK";
+    }
+    @GetMapping("/api/list/fields")
+    public String listFields(@RequestParam String traceID) {
+        List<BindField> fields = BindView.cacheContext.get(traceID);
+        return JSON.toJSONString(fields);
     }
 
 }

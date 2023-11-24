@@ -37,12 +37,18 @@ public class BindView extends VerticalLayout implements BeforeEnterObserver {
 //        primaryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 //        primaryButton.addClickListener(event -> showBinding(""));
 
-        Button saveButton = new Button("返回");
+        Button saveButton = new Button("上一步");
         saveButton.addClickListener(e->{
             UI.getCurrent().navigate("detail/"+traceID);
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         layout.add(saveButton);
+        Button saveButton2 = new Button("下一步");
+        saveButton2.addClickListener(e->{
+            UI.getCurrent().getPage().executeJs("window.java.startTest();");
+        });
+        saveButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        layout.add(saveButton2);
         add(layout);
 
         grid = new Grid<>(BindField.class, false);

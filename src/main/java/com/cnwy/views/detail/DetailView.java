@@ -14,12 +14,14 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.f0rce.ace.AceEditor;
+import de.f0rce.ace.enums.AceMode;
+import de.f0rce.ace.enums.AceTheme;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +37,8 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
     public static final Map<String, String> cacheContext = new HashMap<>();
     public static final Map<String, String> cacheXpath = new HashMap<>();
     String traceID;
+    AceEditor ace;
     TextField start = new TextField();
-    TextArea textArea = new TextArea();
 
     public DetailView() {
         start.setPlaceholder("请输入正则表达式...");
@@ -68,6 +70,7 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
 
         });
         start.setAutofocus(true);
+        start.focus();
         add(start);
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -76,22 +79,24 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
         layout.setJustifyContentMode(JustifyContentMode.END);
 
 
-
         Button primaryButton = new Button("添加");
         layout.add(primaryButton);
         primaryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         primaryButton.addClickListener(event -> showBinding(start.getValue().strip()));
 
-        Button viewButton = new Button("查看");
+        Button viewButton = new Button("下一步");
         layout.add(viewButton);
         viewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         viewButton.addClickListener(event -> showBindResult());
         add(layout);
 
-        textArea.setSizeFull();
-        textArea.setLabel("内容文本");
-        textArea.setEnabled(false);
-        add(textArea);
+        ace = new AceEditor();
+        ace.setSizeFull();
+        ace.setReadOnly(true);
+        ace.setShowGutter(true);
+        ace.setTheme(AceTheme.xcode);
+        ace.setMode(AceMode.text);
+        add(ace);
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.START);
@@ -100,7 +105,7 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     private void showBindResult() {
-        UI.getCurrent().navigate("bind/"+traceID);
+        UI.getCurrent().navigate("bind/" + traceID);
     }
 
     @Override
@@ -110,10 +115,15 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     private void setup() {
-        textArea.setValue(cacheContext.get(traceID));
+        ace.setValue(cacheContext.get(traceID));
     }
 
     private void showBinding(String regex) {
+        if (regex.isBlank()) {
+            Notification notification = Notification.show("请输入正则表达式!", 3000, Notification.Position.TOP_END);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            return;
+        }
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("选择要绑定的属性");
         Select<String> select = new Select<>();
@@ -124,16 +134,23 @@ public class DetailView extends VerticalLayout implements BeforeEnterObserver {
         dialog.setCancelable(true);
 
         dialog.setConfirmText("保存");
+        dialog.setCancelText("取消");
         dialog.addConfirmListener(event -> {
+            if (select.getValue() == null || select.getValue().isBlank()) {
+                Notification notification = Notification.show("请选择要绑定的属性!", 3000, Notification.Position.TOP_END);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
             if (!BindView.cacheContext.containsKey(traceID)) {
                 BindView.cacheContext.put(traceID, new ArrayList<>());
             }
             List<BindField> fields = BindView.cacheContext.get(traceID);
             fields.add(new BindField(DetailView.cacheXpath.get(traceID), regex, select.getValue().strip()));
             BindView.cacheContext.put(traceID, fields);
-            Notification notification = Notification.show("已经保存绑定: " + regex, 3000, Notification.Position.TOP_CENTER);
+            Notification notification = Notification.show("已将正则: " + regex + " 绑定到字段: " + select.getValue(), 3000, Notification.Position.TOP_CENTER);
             System.err.println(traceID);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            start.focus();
         });
         dialog.open();
     }
